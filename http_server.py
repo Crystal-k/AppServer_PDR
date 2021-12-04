@@ -4,7 +4,7 @@ import numpy as np
 from http.server import BaseHTTPRequestHandler
 from http.server import HTTPServer
 
-import util as pdr
+import utils as pdr
 
 
 termLoc = [[0,0]]
