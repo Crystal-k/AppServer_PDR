@@ -17,7 +17,7 @@ eu_g_yaw = df_walking[[col for col in df_walking.columns if 'eu_g_yaw' in col]].
 orientation = df_walking[[col for col in df_walking.columns if 'orientation' in col]].values
 eu_c_yaw = df_walking[[col for col in df_walking.columns if 'eu_c_yaw' in col]].values
 
-pdr = pdr.Model(linear, gravity, rotation, orientation, eu_c_yaw)
+pdr = pdr.Model(linear, gravity, rotation)
 
 # Demo1：显示垂直方向合加速度与步伐波峰分布
 # frequency：数据采集频率
@@ -76,13 +76,13 @@ pdr = pdr.Model(linear, gravity, rotation, orientation, eu_c_yaw)
 # 注意：PDR不清楚初始位置与初始航向角
 # pdr.show_trace(frequency=100, walkType='normal', offset=-MAG_DECLINATION)
 
-_, angle1, angle2, angle3 = pdr.show_trace(frequency=100, walkType='normal', initPosition=(0, 0), offset=0)
-ini_angle1 = angle1[1] * 360 / (2 * np.pi)
-print("IMU初始航向角：", ini_angle1, "° (与地理北向的夹角，顺时针为正方向)")
-ini_angle2 = angle2[1] * 360 / (2 * np.pi)
-print("Orientation初始航向角：", ini_angle2, "° (与地理北向的夹角，顺时针为正方向)")
-ini_angle3 = angle3[1] * 360 / (2 * np.pi)
-print("Android初始航向角：", ini_angle3, "° (与地理北向的夹角，顺时针为正方向)")
+x, y, step = pdr.show_trace(frequency=100, walkType='normal', initPosition=(0, 0), offset=0)
+# ini_angle1 = angle1[1] * 360 / (2 * np.pi)
+# print("IMU初始航向角：", ini_angle1, "° (与地理北向的夹角，顺时针为正方向)")
+# ini_angle2 = angle2[1] * 360 / (2 * np.pi)
+# print("Orientation初始航向角：", ini_angle2, "° (与地理北向的夹角，顺时针为正方向)")
+# ini_angle3 = angle3[1] * 360 / (2 * np.pi)
+# print("Android初始航向角：", ini_angle3, "° (与地理北向的夹角，顺时针为正方向)")
 
 
 # pdr_predictions = [([0] * 2) for i in range(steps+1)]

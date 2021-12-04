@@ -137,8 +137,8 @@ class AndroidHTTPHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     # 启动HTTP服务，此处需使用电脑打开热点，此时IP就是192.168.137.1，然后使用移动设备连接电脑热点，即可实现通信
-    # server = HTTPServer(('192.168.0.186', 8001), AndroidHTTPHandler)
     server = HTTPServer(('192.168.137.1', 8001), AndroidHTTPHandler)
+    # server = HTTPServer(('192.168.0.186', 8001), AndroidHTTPHandler)   # 研究院服务器公网IP
 
     print('Starting server, use <Ctrl-C> to stop')
     server.serve_forever()
