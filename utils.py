@@ -2,10 +2,9 @@
 实验前提：采集数据时手机x轴与重力方向垂直
 
 1.Model
-参数列表（3个参数）：
+参数列表（2个参数）：
 线性加速度矩阵（x轴加速度、y轴加速度、z轴加速度）；
-重力加速度矩阵（x轴重力加速度、y轴重力加速度、z轴重力加速度）;
-四元数矩阵（四元数x、四元数y、四元数z、四元数w）
+方向矩阵（yaw、pitch、roll）;
 
 2.Model参数类型：
 numpy.ndarray
@@ -24,37 +23,42 @@ plt.rcParams['axes.unicode_minus'] = False
 
 
 class Model(object):
-    def __init__(self, linear, gravity, rotation):
+    def __init__(self, linear, orientation):
         self.linear = linear
-        self.gravity = gravity
-        self.rotation = rotation
-        # self.orientation = orientation
-        # self.eu_angle = eu_angle
+        # self.gravity = gravity
+        # self.rotation = rotation
+        # == applet ===========================
+        self.orientation = orientation
+
+        if(len(linear)!= len(orientation)):
+            print("数据不合格！")
 
     # == 步伐检测 ============================
     '''
         功能：
           获得垂直方向上的合加速度（除重力加速度外）
     '''
-
     # crystal: 因为只要求采集时x轴与重力方向垂直,所以夹角用y z轴计算
     def coordinate_conversion(self):
-        gravity = self.gravity
+        # gravity = self.gravity
         linear = self.linear
+        #
+        # # g_x = gravity[:, 0]
+        # g_y = gravity[:, 1]
+        # g_z = gravity[:, 2]
+        #
+        # # linear_x = linear[:, 0]
+        # linear_y = linear[:, 1]
+        # linear_z = linear[:, 2]
+        #
+        # # 手机坐标系与地球坐标系之间的角度（theta）
+        # theta = np.arctan(np.abs(g_y / g_z))
+        #
+        # # 得到垂直方向加速度（除去g）
+        # a_vertical = linear_y * np.sin(theta) + linear_z * np.cos(theta)
 
-        # g_x = gravity[:, 0]
-        g_y = gravity[:, 1]
-        g_z = gravity[:, 2]
-
-        # linear_x = linear[:, 0]
-        linear_y = linear[:, 1]
-        linear_z = linear[:, 2]
-
-        # 手机坐标系与地球坐标系之间的角度（theta）
-        theta = np.arctan(np.abs(g_y / g_z))
-
-        # 得到垂直方向加速度（除去g）
-        a_vertical = linear_y * np.sin(theta) + linear_z * np.cos(theta)
+        # == applet ===========================
+        a_vertical = linear[:, 2]
 
         return a_vertical
 
@@ -69,7 +73,6 @@ class Model(object):
         返回值：
           steps：字典型数组，每个字典保存了峰值位置（index）与该点的合加速度值（acceleration）
     '''
-
     def step_counter(self, frequency=100, walkType='normal'):
         offset = frequency / 100  # 自动转化为浮点数
         g = 9.807
@@ -138,7 +141,6 @@ class Model(object):
           将旋转向量四元数转化为欧拉角（我的解算方法对应Android API getOrientation的实现，单位：弧度）
           基于陀螺仪、加速度传感器、磁力计，与 eu_g_yaw 相对应
     '''
-
     def quaternion2euler(self):
         rotation = self.rotation
         x = rotation[:, 0]
@@ -164,11 +166,11 @@ class Model(object):
 
         return yaw
 
+
     '''
         功能：
           利用Android的TYPE_ORIENTATION方向传感器采集到的姿态角（单位：角度0~360，顺时针为正）
     '''
-
     def step_heading_orientation(self):
         # _, _, yaw = self.quaternion2euler()
         # for i, v in enumerate(yaw):   #原location算法需要逆向
@@ -176,17 +178,18 @@ class Model(object):
         yaw = self.orientation[:, 0] * (np.pi / 180)
         return yaw
 
+
     '''
         功能：
           利用Android建议计算屏幕方向方法采集到的姿态角（单位：弧度-Π~Π，顺时针为正）
           基于加速度传感器、磁力计
     '''
-
     def step_heading_android(self):
         # yaw = self.eu_angle[:, 0] *(np.pi/180)
         yaw = self.eu_angle[:, 0]
 
         return yaw
+
 
     # == 轨迹恢复 ============================
     '''
@@ -324,7 +327,7 @@ class Model(object):
         else:
             offset = 0
 
-        x1, y1, _, angle1 = self.pdr_position_IMU(frequency=frequency, walkType=walkType, initPosition=initPosition,
+        x1, y1, _, angle1 = self.pdr_position_orientation(frequency=frequency, walkType=walkType, initPosition=initPosition,
                                                   offset=offset)
 
 
