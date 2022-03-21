@@ -24,7 +24,16 @@ class AndroidHTTPHandler(BaseHTTPRequestHandler):
         data = json.loads(req_datas)  # 转化为python可处理格式
 
         # print("data",data)
-        response = self.processPDR(data, pdr)
+        flag = data['flag']
+        print("flag",flag)
+        if flag:
+            response = self.processPDR(data, pdr)
+        else:
+            print("reset")
+            print("===============")
+            response = {'status': 'true',
+                        'TermLoc': termLoc[-1]}
+            self.reset()
 
         f = open('./headersistory.txt', mode='a', encoding='utf-8')
         f.write('{}\n'.format(response))
@@ -47,8 +56,8 @@ class AndroidHTTPHandler(BaseHTTPRequestHandler):
         # 解析JSON数据
         global x, y, steps, linear_g, orientation_g, termLoc
 
-        linear_acc_data = data["linearAccData"]
-        orientation_data = data["deviceData"]
+        linear_acc_data = data["LinearAccData"]  # ours
+        orientation_data = data["OrientData"]  # ours
 
         if len(linear_acc_data) != 0 and len(orientation_data) != 0:
             arr_linear = re.split('[,]', linear_acc_data)
