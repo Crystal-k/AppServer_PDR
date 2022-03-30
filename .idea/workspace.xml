@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4d376dc1-a901-4f41-8ce1-2b3ab5247c0b" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/http_server_android.py" afterDir="false" />
+    <list default="true" id="4d376dc1-a901-4f41-8ce1-2b3ab5247c0b" name="默认更改列表" comment="小程序数据/Android数据 测试版v1.0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/figures/result.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/figures/result.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/headersistory.txt" beforeDir="false" afterPath="$PROJECT_DIR$/headersistory.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/http_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/http_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parameters.py" beforeDir="false" afterPath="$PROJECT_DIR$/parameters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server_linux" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -40,7 +41,7 @@
       <recent name="D:\Tools\OneDrive\文档\科研项目\电信合作项目\AppServer_PDR" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.http_server_android">
+  <component name="RunManager" selected="Python.http_server">
     <configuration name="http_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AppServer_PDR" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -109,8 +110,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.http_server_android" />
         <item itemvalue="Python.http_server" />
+        <item itemvalue="Python.http_server_android" />
         <item itemvalue="Python.match_pdr" />
       </list>
     </recent_temporary>
@@ -137,7 +138,11 @@
       <workItem from="1646829957049" duration="887000" />
       <workItem from="1647345306573" duration="5502000" />
       <workItem from="1647395459349" duration="6247000" />
-      <workItem from="1647836920514" duration="660000" />
+      <workItem from="1647836920514" duration="945000" />
+      <workItem from="1647942097268" duration="1793000" />
+      <workItem from="1648026082733" duration="1654000" />
+      <workItem from="1648603430537" duration="9216000" />
+      <workItem from="1648626093905" duration="3831000" />
     </task>
     <task id="LOCAL-00001" summary="小程序数据测试版v1.0">
       <created>1647837093847</created>
@@ -146,65 +151,92 @@
       <option name="project" value="LOCAL" />
       <updated>1647837093847</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="小程序数据/Android数据 测试版v1.0">
+      <created>1647837631432</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1647837631432</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="小程序数据测试版v1.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="小程序数据测试版v1.0" />
+    <MESSAGE value="小程序数据/Android数据 测试版v1.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="小程序数据/Android数据 测试版v1.0" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="257" y="0" key="CommitChangelistDialog2" timestamp="1647837092847">
+    <state x="257" y="0" key="CommitChangelistDialog2" timestamp="1647837771418">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="257" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1647837092847" />
-    <state width="1237" height="142" key="GridCell.Tab.0.bottom" timestamp="1647837524242">
+    <state x="257" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1647837771418" />
+    <state x="740" y="278" key="FileChooserDialogImpl" timestamp="1648624286100">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="278" key="FileChooserDialogImpl/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1648624286100" />
+    <state width="1237" height="320" key="GridCell.Tab.0.bottom" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1877" height="248" key="GridCell.Tab.0.bottom/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1647417165754" />
-    <state width="1237" height="142" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1647837524242" />
-    <state width="1237" height="142" key="GridCell.Tab.0.center" timestamp="1647837524241">
+    <state width="1237" height="320" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.0.center" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1877" height="248" key="GridCell.Tab.0.center/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1647417165754" />
-    <state width="1237" height="142" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1647837524241" />
-    <state width="1237" height="142" key="GridCell.Tab.0.left" timestamp="1647837524241">
+    <state width="1237" height="320" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.0.left" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1877" height="248" key="GridCell.Tab.0.left/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1647417165753" />
-    <state width="1237" height="142" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1647837524241" />
-    <state width="1237" height="142" key="GridCell.Tab.0.right" timestamp="1647837524242">
+    <state width="1237" height="320" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.0.right" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1877" height="248" key="GridCell.Tab.0.right/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1647417165754" />
-    <state width="1237" height="142" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1647837524242" />
-    <state width="1237" height="320" key="GridCell.Tab.1.bottom" timestamp="1647837451195">
+    <state width="1237" height="320" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.1.bottom" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="320" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1647837451195" />
-    <state width="1237" height="320" key="GridCell.Tab.1.center" timestamp="1647837451195">
+    <state width="1237" height="320" key="GridCell.Tab.1.bottom/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.1.center" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="320" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1647837451195" />
-    <state width="1237" height="320" key="GridCell.Tab.1.left" timestamp="1647837451195">
+    <state width="1237" height="320" key="GridCell.Tab.1.center/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.1.left" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="320" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1647837451195" />
-    <state width="1237" height="320" key="GridCell.Tab.1.right" timestamp="1647837451195">
+    <state width="1237" height="320" key="GridCell.Tab.1.left/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state width="1237" height="320" key="GridCell.Tab.1.right" timestamp="1647837873132">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="320" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1647837451195" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1647347515927">
+    <state width="1237" height="320" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1647837873132" />
+    <state x="233" y="77" key="Vcs.Push.Dialog.v2" timestamp="1647837819415">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="233" y="77" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1647837819415" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1648623213212">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1647347515927" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/-1920.0.1280.693/0.0.1920.1040@0.0.1920.1040" timestamp="1648623213212" />
+    <state x="415" y="147" width="672" height="444" key="search.everywhere.popup/0.0.1280.680@0.0.1280.680" timestamp="1647837792796" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AppServer_PDR$http_server_android.coverage" NAME="http_server_android Coverage Results" MODIFIED="1647837524233" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/AppServer_PDR$match_pdr.coverage" NAME="match_pdr Coverage Results" MODIFIED="1638621050788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AppServer_PDR$http_server.coverage" NAME="http_server Coverage Results" MODIFIED="1647836976518" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AppServer_PDR$http_server.coverage" NAME="http_server Coverage Results" MODIFIED="1648606221319" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

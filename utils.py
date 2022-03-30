@@ -12,8 +12,9 @@ numpy.ndarray
 
 import math
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
 from scipy.stats import norm
 
 from parameters import RESULT_FIGURE
@@ -25,40 +26,33 @@ plt.rcParams['axes.unicode_minus'] = False
 class Model(object):
     def __init__(self, linear, orientation):
         self.linear = linear
-        # self.gravity = gravity
-        # self.rotation = rotation
-        # == applet ===========================
         self.orientation = orientation
 
         if(len(linear)!= len(orientation)):
             print("数据不合格！")
 
-    # == 步伐检测 ============================
+
+    # == 步伐检测（计步） ============================
     '''
         功能：
           获得垂直方向上的合加速度（除重力加速度外）
     '''
-    # crystal: 因为只要求采集时x轴与重力方向垂直,所以夹角用y z轴计算
     def coordinate_conversion(self):
-        # gravity = self.gravity
         linear = self.linear
-        #
-        # # g_x = gravity[:, 0]
-        # g_y = gravity[:, 1]
-        # g_z = gravity[:, 2]
-        #
-        # # linear_x = linear[:, 0]
-        # linear_y = linear[:, 1]
-        # linear_z = linear[:, 2]
-        #
-        # # 手机坐标系与地球坐标系之间的角度（theta）
-        # theta = np.arctan(np.abs(g_y / g_z))
-        #
-        # # 得到垂直方向加速度（除去g）
-        # a_vertical = linear_y * np.sin(theta) + linear_z * np.cos(theta)
+        pitch = self.orientation[:, 1]  # [-180, 180]，平放为0°，顶端朝下为正
 
-        # == applet ===========================
-        a_vertical = linear[:, 2]
+        if -45 < np.average(pitch) <= 45:
+            print("手机为屏幕朝上的水平状态。")
+            a_vertical = linear[:, 2]
+        elif -135 < np.average(pitch) <= -45:
+            print("手机为摄像头朝前的竖直状态。")
+            a_vertical = linear[:, 1]
+        elif -180 <= np.average(pitch) <= -135 or 135 < np.average(pitch) <= 180:
+            print("手机为屏幕朝下的水平状态。")
+            a_vertical = -linear[:, 2]
+        elif 45 < np.average(pitch) <= 135:
+            print("手机为摄像头朝用户的竖直状态。")
+            a_vertical = -linear[:, 1]
 
         return a_vertical
 
@@ -77,21 +71,21 @@ class Model(object):
         offset = frequency / 100  # 自动转化为浮点数
         g = 9.807
         a_vertical = self.coordinate_conversion()
-        slide = 40 * offset  # 滑动窗口（100Hz的采样数据）=>不管采样频率多少，大小为0.4s内采集到的样本数
+        slide = 50 * offset  # 滑动窗口（100Hz的采样数据）=>不管采样频率多少，大小为0.4s内采集到的样本数
         frequency = 100 * offset
 
-        # 行人加速度阈值
-        min_acceleration = 0.15 * g  # 0.2g
-        max_acceleration = 2 * g  # 2g
+        # 行人加速度阈值（小程序采集到的是负值 ）
+        min_acceleration = -0.85 * g  # 0.2g
+        max_acceleration = -0.02 * g  # 2g
 
         # 峰值间隔(s)
         # min_interval = 0.4
-        min_interval = 0.4 if walkType == 'normal' else 3  # 'abnormal
+        min_interval = 0.5 if walkType == 'normal' else 3  # 'abnormal
         # max_interval = 1
 
         # 计算步数
         steps = []
-        peak = {'index': 0, 'acceleration': 0}
+        peak = {'index': 0, 'acceleration': -100}
 
         # 以40*offset为滑动窗检测峰值
         # 条件1：峰值在0.25g~2g之间
@@ -101,7 +95,7 @@ class Model(object):
                 peak['index'] = i
             if i % slide == 0 and peak['index'] != 0:
                 steps.append(peak)
-                peak = {'index': 0, 'acceleration': 0}
+                peak = {'index': 0, 'acceleration': -100}
 
         # 条件2：两个峰值之前间隔至少大于0.4s*offset
         # del使用的时候，一般采用先记录再删除的原则
@@ -129,65 +123,21 @@ class Model(object):
 
         return steps
 
+
     # == 步长估计 ============================
     # 目前的方法不具备科学性，临时使用
-    # crystal: 经验模型L=C.((a_max-a_min)*(1/4))（C取0.4; a_min取0）
+    # crystal: 经验模型L=C.((a_max-a_min)**(1/4))（C取0.4; a_min取0）
     def step_stride(self, max_acceleration):
-        return np.power(max_acceleration, 1 / 4) * 0.4
+        return np.power(abs(max_acceleration), 1 / 4) * 0.4
+
 
     # == 航向估计 ============================
     '''
         功能：
-          将旋转向量四元数转化为欧拉角（我的解算方法对应Android API getOrientation的实现，单位：弧度）
-          基于陀螺仪、加速度传感器、磁力计，与 eu_g_yaw 相对应
-    '''
-    def quaternion2euler(self):
-        rotation = self.rotation
-        x = rotation[:, 0]
-        y = rotation[:, 1]
-        z = rotation[:, 2]
-        w = rotation[:, 3]
-
-        # 原location解算方法（结果一致，方向有些差别）
-        # pitch = np.arcsin(2*(w*y-z*x))  # 逆时针
-        # roll = np.arctan2(2*(w*x+y*z),1-2*(x*x+y*y))   # 逆时针
-        # yaw = np.arctan2(2*(w*z+x*y),1-2*(z*z+y*y))   # 逆时针
-        yaw = np.arctan2(2 * (x * y - z * w), 1 - 2 * (x * x + z * z))  # 顺时针
-        pitch = np.arcsin(- 2 * (y * z + x * w))  # 顺时针
-        roll = np.arctan2(2 * (y * w - x * z), 1 - 2 * (x * x + y * y))  # 逆时针
-
-        return roll, pitch, yaw
-
-    # 根据姿势直接使用yaw
-    def step_heading_IMU(self):
-        _, _, yaw = self.quaternion2euler()
-        # for i, v in enumerate(yaw):   #原location算法需要逆向
-        #     yaw[i] = -v
-
-        return yaw
-
-
-    '''
-        功能：
-          利用Android的TYPE_ORIENTATION方向传感器采集到的姿态角（单位：角度0~360，顺时针为正）
+          利用小程序的方向传感器采集到的姿态角（单位：角度0~360，顺时针为正）
     '''
     def step_heading_orientation(self):
-        # _, _, yaw = self.quaternion2euler()
-        # for i, v in enumerate(yaw):   #原location算法需要逆向
-        #     yaw[i] = -v
         yaw = self.orientation[:, 0] * (np.pi / 180)
-        return yaw
-
-
-    '''
-        功能：
-          利用Android建议计算屏幕方向方法采集到的姿态角（单位：弧度-Π~Π，顺时针为正）
-          基于加速度传感器、磁力计
-    '''
-    def step_heading_android(self):
-        # yaw = self.eu_angle[:, 0] *(np.pi/180)
-        yaw = self.eu_angle[:, 0]
-
         return yaw
 
 
@@ -205,36 +155,6 @@ class Model(object):
         返回值：
           每一步的x、y坐标值，以及每一步的步长和航向角
     '''
-
-    def pdr_position_IMU(self, frequency=100, walkType='normal', initPosition=(0, 0), offset=0):
-        yaw = self.step_heading_IMU()
-        steps = self.step_counter(frequency=frequency, walkType=walkType)
-        position_x = []
-        position_y = []
-        x = initPosition[0]
-        y = initPosition[1]
-        position_x.append(x)
-        position_y.append(y)
-        strides = []
-        angle = [offset]
-
-        for v in steps:
-            index = v['index']
-
-            length = self.step_stride(v['acceleration'])
-            strides.append(length)
-
-            theta = yaw[index] + offset
-            angle.append(theta)
-
-            x = x + length * np.sin(theta)
-            y = y + length * np.cos(theta)
-            position_x.append(x)
-            position_y.append(y)
-
-        # 步长计入一个状态中，最后一个位置没有下一步，因此步长记为0
-        return position_x, position_y, strides + [0], angle
-
     def pdr_position_orientation(self, frequency=100, walkType='normal', initPosition=(0, 0), offset=0):
         yaw = self.step_heading_orientation()
         steps = self.step_counter(frequency=frequency, walkType=walkType)
@@ -264,34 +184,6 @@ class Model(object):
         # 步长计入一个状态中，最后一个位置没有下一步，因此步长记为0
         return position_x, position_y, strides + [0], angle
 
-    def pdr_position_android(self, frequency=100, walkType='normal', initPosition=(0, 0), offset=0):
-        yaw = self.step_heading_android()
-        steps = self.step_counter(frequency=frequency, walkType=walkType)
-        position_x = []
-        position_y = []
-        x = initPosition[0]
-        y = initPosition[1]
-        position_x.append(x)
-        position_y.append(y)
-        strides = []
-        angle = [offset]
-
-        for v in steps:
-            index = v['index']
-
-            length = self.step_stride(v['acceleration'])
-            strides.append(length)
-
-            theta = yaw[index] + offset
-            angle.append(theta)
-
-            x = x + length * np.sin(theta)
-            y = y + length * np.cos(theta)
-            position_x.append(x)
-            position_y.append(y)
-
-        # 步长计入一个状态中，最后一个位置没有下一步，因此步长记为0
-        return position_x, position_y, strides + [0], angle
 
     '''
         功能：
@@ -306,11 +198,10 @@ class Model(object):
                   但实验输出图有时候会分析一个相对定位的情景，所以可以用该偏差值进行修正）
           realTrace：两列的numpy.ndarray格式数据，表示真实轨迹坐标，主要是为了方便轨迹的对比（可选）
     '''
-
     def show_trace(self, frequency=100, walkType='normal', initPosition=(0, 0), **kw):
         handles = []
         labels = []
-
+        stepsAxis = []
         if 'real_trace' in kw:
             real_trace = kw['real_trace'].T
             trace_x = real_trace[0]
@@ -326,42 +217,21 @@ class Model(object):
             offset = kw['offset']
         else:
             offset = 0
-
         x1, y1, _, angle1 = self.pdr_position_orientation(frequency=frequency, walkType=walkType, initPosition=initPosition,
                                                   offset=offset)
-
 
         plt.cla() #清除当前图像，若不清除则前面画的图保留
         l1, = plt.plot(x1, y1, '*-')
         handles.append(l1)
-        labels.append('IMU predicting(rotation vector)')
+        labels.append('IMU predicting')
 
         for k in range(0, len(x1)):
             if (k == 0):
                 plt.annotate("起点", xy=(x1[k], y1[k]), xytext=(x1[k] + 0.1, y1[k] + 0.1))
+                stepsAxis.append([x1[k], y1[k]])
             else:
                 plt.annotate(k, xy=(x1[k], y1[k]), xytext=(x1[k] + 0.1, y1[k] + 0.1))
-
-        # x2, y2, _,angle2 = self.pdr_position_orientation(frequency=frequency, walkType=walkType, initPosition=initPosition, offset=offset)
-        #
-        # l2, = plt.plot(x2, y2, 'o-')
-        # handles.append(l2)
-        # labels.append('Orientation predicting(TYPE_ORIENTATION)')
-        #
-        # for k in range(0, len(x2)):
-        #     plt.annotate(k, xy=(x2[k], y2[k]), xytext=(x2[k] + 0.1, y2[k] + 0.1))
-        #
-        #
-        # x3, y3, _, angle3 = self.pdr_position_android(frequency=frequency, walkType=walkType,
-        #                                                initPosition=initPosition,
-        #                                                offset=offset)
-        #
-        # l3, = plt.plot(x3, y3, 'x-')
-        # handles.append(l3)
-        # labels.append('Android predicting')
-        #
-        # for k in range(1, len(x3)):
-        #     plt.annotate(k, xy=(x3[k], y3[k]), xytext=(x3[k] + 0.1, y3[k] + 0.1))
+                stepsAxis.append([x1[k], y1[k]])
 
         plt.legend(handles=handles, labels=labels, loc='best')
         plt.xlabel("单位：m")
@@ -374,9 +244,9 @@ class Model(object):
         plt.savefig(RESULT_FIGURE + "result.jpg")
 
         steps = len(x1) - 1
-        print('steps:', steps)
 
-        return x1, y1, steps
+        return x1, y1, steps, stepsAxis
+
 
 
     # == demo测试 ============================
@@ -388,7 +258,6 @@ class Model(object):
           normal：正常行走模式
           abnormal：融合定位行走模式（每一步行走间隔大于1s）
     '''
-
     def show_steps(self, frequency=100, walkType='normal'):
         a_vertical = self.coordinate_conversion()
         steps = self.step_counter(frequency=frequency, walkType=walkType)
@@ -409,7 +278,9 @@ class Model(object):
         plt.scatter(index_test, value_test, color='r')
         plt.xlabel('samples')
         plt.ylabel('vertical acceleration')
-        plt.show()
+        # plt.show()
+        plt.savefig(RESULT_FIGURE + "show_steps.jpg")
+
 
     '''
         功能：
@@ -419,7 +290,6 @@ class Model(object):
           data：某一轴加速度数据
           fit：布尔值，是否进行高斯拟合
     '''
-
     def show_gaussian(self, data, fit):
         wipe = 150
         data = data[wipe:len(data) - wipe]
@@ -465,7 +335,9 @@ class Model(object):
         plt.xlabel('acceleration')
         plt.ylabel('total samples')
         plt.legend()
-        plt.show()
+        # plt.show()
+        plt.savefig(RESULT_FIGURE + "show_gaussian.jpg")
+
 
     '''
         功能：
@@ -476,7 +348,6 @@ class Model(object):
           gravity：查看三轴重力加速度的分布情况 
           rotation：查看旋转四元数的数据分布情况
     '''
-
     def show_data(self, dataType):
         if dataType == 'linear':
             linear = self.linear
@@ -497,7 +368,8 @@ class Model(object):
             plt.sca(ax3)
             plt.title('z')
             plt.scatter(index, z)
-            plt.show()
+            # plt.show()
+            plt.savefig(RESULT_FIGURE + "show_data.jpg")
         elif dataType == 'gravity':
             gravity = self.gravity
             x = gravity[:, 0]
