@@ -24,7 +24,15 @@ plt.rcParams['axes.unicode_minus'] = False
 
 
 class Model(object):
-    def __init__(self, linear, orientation):
+    def __init__(self, linear_demo, orientation_demo, distance=0, linear=[[]], orientation=[[]]):
+        self.linear_demo = linear_demo
+        self.orientation_demo = orientation_demo
+        self.distance = distance
+
+        if(len(linear_demo)!= len(orientation_demo)):
+            print("demo数据不合格！")
+
+
         self.linear = linear
         self.orientation = orientation
 
@@ -37,9 +45,9 @@ class Model(object):
         功能：
           获得垂直方向上的合加速度（除重力加速度外）
     '''
-    def coordinate_conversion(self):
-        linear = self.linear
-        pitch = self.orientation[:, 1]  # [-180, 180]，平放为0°，顶端朝下为正
+    def coordinate_conversion(self, linear, orientation):
+        linear = linear
+        pitch = orientation[:, 1]  # [-180, 180]，平放为0°，顶端朝下为正
 
         if -45 < np.average(pitch) <= 45:
             print("手机为屏幕朝上的水平状态。")
@@ -67,16 +75,16 @@ class Model(object):
         返回值：
           steps：字典型数组，每个字典保存了峰值位置（index）与该点的合加速度值（acceleration）
     '''
-    def step_counter(self, frequency=100, walkType='normal'):
+    def step_counter(self, linear, orientation, frequency=100, walkType='normal'):
         offset = frequency / 100  # 自动转化为浮点数
         g = 9.807
-        a_vertical = self.coordinate_conversion()
-        slide = 50 * offset  # 滑动窗口（100Hz的采样数据）=>不管采样频率多少，大小为0.4s内采集到的样本数
+        a_vertical = self.coordinate_conversion(linear, orientation)
+        slide = 50 * offset  # 滑动窗口（100Hz的采样数据）=>不管采样频率多少，大小为0.5s内采集到的样本数
         frequency = 100 * offset
 
         # 行人加速度阈值（小程序采集到的是负值 ）
         min_acceleration = -0.85 * g  # 0.2g
-        max_acceleration = -0.02 * g  # 2g
+        max_acceleration = -0.11 * g  # 2g
 
         # 峰值间隔(s)
         # min_interval = 0.4
@@ -127,8 +135,32 @@ class Model(object):
     # == 步长估计 ============================
     # 目前的方法不具备科学性，临时使用
     # crystal: 经验模型L=C.((a_max-a_min)**(1/4))（C取0.4; a_min取0）
-    def step_stride(self, max_acceleration):
-        return np.power(abs(max_acceleration), 1 / 4) * 0.4
+    def step_stride(self, max_acceleration, c=0.4):
+        return np.power(abs(max_acceleration), 1 / 4) * c
+
+    def cal_para(self, frequency=100, walkType='normal'):
+        linear_demo = self.linear_demo  # [len, 3]
+        ori_demo = self.orientation_demo
+        distance = self.distance
+
+        steps = self.step_counter(linear=linear_demo, orientation=ori_demo, frequency=frequency, walkType=walkType)
+        step_count = steps.__len__()
+        print("demo data's step count:", step_count)
+
+        if step_count == 0:
+            c = 0.4
+            print("step count is zero, Can't calculate parameter!")
+            print("default parameter:", c)
+        else:
+            step_length = distance/step_count
+            peak_accs = []
+            for v in steps:
+                peak_accs.append(v['acceleration'])
+            peak_acc = np.mean(peak_accs)
+            c = np.round(step_length/np.power(abs(peak_acc), 1 / 4), 2)
+            print("demo parameter estimation:", c)
+
+        return c
 
 
     # == 航向估计 ============================
@@ -136,8 +168,8 @@ class Model(object):
         功能：
           利用小程序的方向传感器采集到的姿态角（单位：角度0~360，顺时针为正）
     '''
-    def step_heading_orientation(self):
-        yaw = self.orientation[:, 0] * (np.pi / 180)
+    def step_heading_orientation(self, orientation):
+        yaw = orientation[:, 0] * (np.pi / 180)
         return yaw
 
 
@@ -155,9 +187,9 @@ class Model(object):
         返回值：
           每一步的x、y坐标值，以及每一步的步长和航向角
     '''
-    def pdr_position_orientation(self, frequency=100, walkType='normal', initPosition=(0, 0), offset=0):
-        yaw = self.step_heading_orientation()
-        steps = self.step_counter(frequency=frequency, walkType=walkType)
+    def pdr_position_orientation(self, frequency=100, walkType='normal', para_c=0.4, initPosition=(0, 0), offset=0):
+        yaw = self.step_heading_orientation(orientation = self.orientation)
+        steps = self.step_counter(linear=self.linear, orientation=self.orientation, frequency=frequency, walkType=walkType)
         position_x = []
         position_y = []
         x = initPosition[0]
@@ -170,7 +202,7 @@ class Model(object):
         for v in steps:
             index = v['index']
 
-            length = self.step_stride(v['acceleration'])
+            length = self.step_stride(v['acceleration'], c=para_c)
             strides.append(length)
 
             theta = yaw[index] + offset
@@ -198,7 +230,7 @@ class Model(object):
                   但实验输出图有时候会分析一个相对定位的情景，所以可以用该偏差值进行修正）
           realTrace：两列的numpy.ndarray格式数据，表示真实轨迹坐标，主要是为了方便轨迹的对比（可选）
     '''
-    def show_trace(self, frequency=100, walkType='normal', initPosition=(0, 0), **kw):
+    def show_trace(self, frequency=100, walkType='normal', para_c=0.4, initPosition=(0, 0), **kw):
         handles = []
         labels = []
         stepsAxis = []
@@ -217,7 +249,7 @@ class Model(object):
             offset = kw['offset']
         else:
             offset = 0
-        x1, y1, _, angle1 = self.pdr_position_orientation(frequency=frequency, walkType=walkType, initPosition=initPosition,
+        x1, y1, _, angle1 = self.pdr_position_orientation(frequency=frequency, walkType=walkType, para_c=para_c, initPosition=initPosition,
                                                   offset=offset)
 
         plt.cla() #清除当前图像，若不清除则前面画的图保留
@@ -258,9 +290,9 @@ class Model(object):
           normal：正常行走模式
           abnormal：融合定位行走模式（每一步行走间隔大于1s）
     '''
-    def show_steps(self, frequency=100, walkType='normal'):
-        a_vertical = self.coordinate_conversion()
-        steps = self.step_counter(frequency=frequency, walkType=walkType)
+    def show_steps(self, linear, orientation, frequency=100, walkType='normal'):
+        a_vertical = self.coordinate_conversion(linear, orientation)
+        steps = self.step_counter(linear, orientation, frequency=frequency, walkType=walkType)
 
         index_test = []
         value_test = []

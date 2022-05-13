@@ -808,3 +808,22 @@
 {'status': 'true', 'TermLoc': [-3.78, 3.45]}
 {'status': 'true', 'TermLoc': [-4.59, 4.16]}
 {'status': 'true', 'TermLoc': [-4.59, 4.16]}
+{'status': 'true', 'para_c': 5.90746787831157}
+{'status': 'true', 'para_c': 7.03}
+{'status': 'true', 'para_c': 1.49}
+{'status': 'true', 'para_c': 4.88}
+{'status': 'true', 'para_c': 0.4}
+{'status': 'true', 'para_c': 4.84}
+{'status': 'true', 'para_c': 2.43}
+{'status': 'true', 'para_c': 2.36}
+{'status': 'true', 'para_c': 4.22}
+{'status': 'true', 'para_c': 2.36}
+{'status': 'true', 'para_c': 4.9}
+{'status': 'true', 'para_c': 0.57}
+{'status': 'true', 'para_c': 0.68}
+{'status': 'true', 'para_c': 0.67}
+{'status': 'true', 'para_c': 0.81}
+{'status': 'true', 'para_c': 0.57}
+{'status': 'true', 'para_c': 0.63}
+{'status': 'true', 'para_c': 0.63}
+{'status': 'true', 'para_c': 2.39}
